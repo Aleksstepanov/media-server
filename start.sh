@@ -1,18 +1,20 @@
 #!/bin/bash
-
 set -e
 
-# Подставляем ключи в шаблон конфигурации
-envsubst < /app/rclone.conf.template > /app/rclone.conf
+echo "[INFO] Generating rclone.conf from template"
+envsubst < /config/rclone.conf.template > /config/rclone.conf
 
-# Монтируем S3 через rclone (в фоне)
-rclone mount timeweb_s3:${S3_BUCKET} /mnt/music \
+echo "[INFO] Mounting rclone..."
+mkdir -p /mnt/music
+
+rclone mount timeweb_s3:cb4f3c27-b7b96197-61cf-4ffe-9dbe-ec7a7d596aad \
+  /mnt/music \
+  --config /config/rclone.conf \
   --allow-other \
   --vfs-cache-mode writes \
-  --config /app/rclone.conf &
+  --daemon
 
-# Небольшая задержка, чтобы примонтировалось
-sleep 3
+sleep 2
 
-# Запуск Navidrome
-/app/navidrome --configfile /app/navidrome.toml
+echo "[INFO] Starting Navidrome..."
+exec su-exec navidrome /opt/navidrome --configfile /etc/navidrome.toml
