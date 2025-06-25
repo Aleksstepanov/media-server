@@ -1,0 +1,3 @@
+MusicFolder = "/mnt/music"
+DataFolder = "/app/data"
+Port = "4533"
